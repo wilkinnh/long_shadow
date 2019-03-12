@@ -61,25 +61,35 @@ class _LongShadowState extends State<LongShadow> {
     return Material(
       color: Colors.transparent,
       key: _key,
-      child: LayoutBuilder(builder: (context, constraints) {
-        return ShaderMask(
-          shaderCallback: (bounds) {
-            return ImageShader(_maskImage, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage);
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [this.widget.color, this.widget.color.withOpacity(0.0), this.widget.color.withOpacity(0.0)],
-                stops: [0, 1.0, 1.0],
-                tileMode: TileMode.clamp,
-              ),
-            ),
-            child: Center(child: this.widget.text),
+      child: Stack(
+        children: <Widget>[
+          Positioned.fill(
+            child: LayoutBuilder(builder: (context, constraints) {
+              return ShaderMask(
+                shaderCallback: (bounds) {
+                  return ImageShader(_maskImage, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        this.widget.color,
+                        this.widget.color.withOpacity(0.0),
+                        this.widget.color.withOpacity(0.0)
+                      ],
+                      stops: [0, 1.0, 1.0],
+                      tileMode: TileMode.clamp,
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
-        );
-      }),
+          Positioned.fill(child: Center(child: this.widget.text))
+        ],
+      ),
     );
   }
 }
