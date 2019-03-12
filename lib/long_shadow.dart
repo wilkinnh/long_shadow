@@ -58,8 +58,8 @@ class _LongShadowState extends State<LongShadow> {
     if (_maskImage == null) {
       return Container(key: _key);
     }
-    print("got mask: (${_maskImage.width}, ${_maskImage.height})");
-    return Container(
+    return Material(
+      color: Colors.transparent,
       key: _key,
       child: LayoutBuilder(builder: (context, constraints) {
         return ShaderMask(
@@ -68,7 +68,6 @@ class _LongShadowState extends State<LongShadow> {
           },
           child: Container(
             decoration: BoxDecoration(
-//              color: Colors.black,
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,

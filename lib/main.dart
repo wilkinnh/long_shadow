@@ -9,7 +9,7 @@ class FlutterSampleApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: Scaffold(
         resizeToAvoidBottomPadding: false,

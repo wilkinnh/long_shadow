@@ -5,17 +5,24 @@ import 'dart:math';
 
 class FullscreenLongShadow extends StatefulWidget {
   final Text text;
-  final Color color;
+  final Color shadowColor;
+  final Color backgroundColor;
   final bool motionEnabled;
 
-  const FullscreenLongShadow({Key key, this.text, this.color, this.motionEnabled}) : super(key: key);
+  const FullscreenLongShadow(
+      {Key key,
+      @required this.text,
+      this.shadowColor = Colors.black38,
+      this.motionEnabled = true,
+      this.backgroundColor = Colors.green})
+      : super(key: key);
 
   @override
   _FullscreenLongShadowState createState() => _FullscreenLongShadowState();
 }
 
 class _FullscreenLongShadowState extends State<FullscreenLongShadow> {
-  double _normalizedAngle = -1;
+  double _angle = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +33,12 @@ class _FullscreenLongShadowState extends State<FullscreenLongShadow> {
       child: Hero(
         tag: 'long-shadow2',
         child: Container(
-          color: Colors.green,
+          color: this.widget.backgroundColor,
           child: SafeArea(
-            child: Container(
-//              decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.red)),
-              child: LongShadow(
-                text: this.widget.text,
-                color: this.widget.color,
-                angle: _normalizedAngle,
-              ),
+            child: LongShadow(
+              text: this.widget.text,
+              color: this.widget.shadowColor,
+              angle: _angle,
             ),
           ),
         ),
@@ -47,21 +51,16 @@ class _FullscreenLongShadowState extends State<FullscreenLongShadow> {
     super.initState();
 
     gyroscopeEvents.listen((GyroscopeEvent event) {
-      if (!this.widget.motionEnabled) {
-        return;
-      }
-
-      // dead space
-      if (event.y.abs() < 0.2) {
+      if (!this.widget.motionEnabled || event.y.abs() < 0.2) {
         return;
       }
 
       // rotation is measured in radians per second
-      var normalizedSpeed = event.y / 10;
-      var newValue = max(min(1, normalizedSpeed + _normalizedAngle), -1);
+      var normalizedSpeed = event.y / 30;
+      var newValue = max(min(1, normalizedSpeed + _angle), -1).toDouble();
 
       setState(() {
-        _normalizedAngle = newValue;
+        _angle = newValue;
       });
     });
   }
