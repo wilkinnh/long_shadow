@@ -80,6 +80,8 @@ class _LongShadowPlaygroundState extends State<LongShadowPlayground> {
                                   ),
                                 ),
                                 shadowColor: Colors.black.withOpacity(_shadowOpacity),
+                                backgroundColor: Theme.of(context).primaryColor,
+                                angle: _angle,
                               ),
                             );
                           },

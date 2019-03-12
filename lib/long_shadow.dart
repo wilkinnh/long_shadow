@@ -45,6 +45,7 @@ class _LongShadowState extends State<LongShadow> {
       text: this.widget.text,
       color: this.widget.color,
       angle: this.widget.angle,
+      pixelDensity: 1, //MediaQuery.of(context).devicePixelRatio,
     );
 
     var mask = await painter.generateMaskImage(context);
@@ -99,10 +100,11 @@ class LongShadowPainter {
   final Text text;
   final Color color;
   final double angle;
+  final double pixelDensity;
 
   TextPainter _textPainter;
 
-  LongShadowPainter({this.size, this.text, this.color, this.angle}) {
+  LongShadowPainter({this.size, this.text, this.color, this.angle, this.pixelDensity}) {
     _textPainter = TextPainter(
       text: TextSpan(
         text: this.text.data,
@@ -124,10 +126,10 @@ class LongShadowPainter {
     var recorder = ui.PictureRecorder();
     Canvas shadowMask = Canvas(recorder);
 
-    double length = size.height * .75;
+    double length = size.height * .75 * pixelDensity;
     for (double i = 0; i < length; i++) {
       var xOffset = i * (this.angle * -.5);
-      _textPainter.paint(shadowMask, initialOffset + Offset(xOffset, i));
+      _textPainter.paint(shadowMask, initialOffset + Offset(xOffset / pixelDensity, i / pixelDensity));
     }
 
     var picture = recorder.endRecording();
