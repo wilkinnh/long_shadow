@@ -48,60 +48,12 @@ class _FullscreenLongShadowState extends State<FullscreenLongShadow> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pop();
-      },
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: Hero(
-              tag: 'long-shadow2',
-              child: Container(
-                color: this.widget.backgroundColor,
-                child: SafeArea(
-                  child: LongShadow(
-                    text: this.widget.text,
-                    color: this.widget.shadowColor,
-                    angle: _angle,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Center(
-              child: Transform.rotate(
-                angle: _angle * (pi / 8),
-                child: AspectRatio(
-                  aspectRatio: .75,
-                  child: Container(
-//                    decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black)),
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.yellow,
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+    return Container(
+      color: this.widget.backgroundColor,
+      child: LongShadow(
+        text: this.widget.text,
+        color: this.widget.shadowColor,
+        angle: _angle,
       ),
     );
   }

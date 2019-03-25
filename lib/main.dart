@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:long_shadow/playground.dart';
+import 'package:long_shadow/fullscreen.dart';
 
 void main() => runApp(FlutterSampleApp());
 
@@ -7,14 +7,19 @@ class FlutterSampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Long Shadow Demo',
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
       home: Scaffold(
-        resizeToAvoidBottomPadding: false,
-        body: SafeArea(
-          child: LongShadowPlayground(),
+        body: FullscreenLongShadow(
+          text: Text(
+            'S',
+            style: TextStyle(
+              fontSize: 200,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );

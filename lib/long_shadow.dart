@@ -20,7 +20,20 @@ class _LongShadowState extends State<LongShadow> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) => updateMask());
+
     super.initState();
+
+    _textPainter = TextPainter(
+      text: TextSpan(
+        text: this.widget.text.data,
+        style: TextStyle(
+          fontSize: this.widget.text.style.fontSize,
+          fontWeight: this.widget.text.style.fontWeight,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    _textPainter.layout();
   }
 
   @override
@@ -31,27 +44,31 @@ class _LongShadowState extends State<LongShadow> {
 
   void updateMask() async {
     var state = _key.currentContext;
-    if (state == null) {
+    if (state == null || state.findRenderObject() == null) {
       return;
     }
 
-    RenderBox renderBox = context.findRenderObject();
-    if (renderBox == null) {
-      return;
-    }
-
-    LongShadowPainter painter = LongShadowPainter(
-      size: renderBox.size,
-      text: this.widget.text,
-      color: this.widget.color,
-      angle: this.widget.angle,
-      pixelDensity: 1, //MediaQuery.of(context).devicePixelRatio,
-    );
-
-    var mask = await painter.generateMaskImage(context);
+    RenderBox renderBox = state.findRenderObject();
+    var mask = await generateMaskImage(context, renderBox.size);
     setState(() {
       _maskImage = mask;
     });
+  }
+
+  Future<ui.Image> generateMaskImage(BuildContext context, Size size) {
+    var initialOffset = Offset((size.width - _textPainter.width) / 2, (size.height - _textPainter.height) / 2);
+
+    var recorder = ui.PictureRecorder();
+    Canvas shadowMask = Canvas(recorder);
+
+    double length = size.height * .75;
+    for (double i = 0; i < length; i++) {
+      var xOffset = i * (this.widget.angle * -.5);
+      _textPainter.paint(shadowMask, initialOffset + Offset(xOffset, i));
+    }
+
+    var picture = recorder.endRecording();
+    return picture.toImage(size.width.toInt(), size.height.toInt());
   }
 
   @override
@@ -64,75 +81,27 @@ class _LongShadowState extends State<LongShadow> {
       key: _key,
       child: Stack(
         children: <Widget>[
-          Positioned.fill(
-            child: LayoutBuilder(builder: (context, constraints) {
-              return ShaderMask(
-                shaderCallback: (bounds) {
-                  return ImageShader(_maskImage, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        this.widget.color,
-                        this.widget.color.withOpacity(0.0),
-                        this.widget.color.withOpacity(0.0)
-                      ],
-                      stops: [0, 1.0, 1.0],
-                      tileMode: TileMode.clamp,
-                    ),
+          LayoutBuilder(builder: (context, constraints) {
+            return ShaderMask(
+              shaderCallback: (bounds) {
+                return ImageShader(_maskImage, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [this.widget.color, this.widget.color.withOpacity(0.0), this.widget.color.withOpacity(0.0)],
+                    stops: [0, 1.0, 1.0],
+                    tileMode: TileMode.clamp,
                   ),
                 ),
-              );
-            }),
-          ),
-          Positioned.fill(child: Center(child: this.widget.text))
+              ),
+            );
+          }),
+          Center(child: this.widget.text),
         ],
       ),
     );
-  }
-}
-
-class LongShadowPainter {
-  final Size size;
-  final Text text;
-  final Color color;
-  final double angle;
-  final double pixelDensity;
-
-  TextPainter _textPainter;
-
-  LongShadowPainter({this.size, this.text, this.color, this.angle, this.pixelDensity}) {
-    _textPainter = TextPainter(
-      text: TextSpan(
-        text: this.text.data,
-        style: TextStyle(
-          fontSize: this.text.style.fontSize,
-          fontWeight: this.text.style.fontWeight,
-          color: Colors.white,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    _textPainter.layout();
-  }
-
-  Future<ui.Image> generateMaskImage(BuildContext context) {
-    var initialOffset =
-        Offset((this.size.width - _textPainter.width) / 2, (this.size.height - _textPainter.height) / 2);
-
-    var recorder = ui.PictureRecorder();
-    Canvas shadowMask = Canvas(recorder);
-
-    double length = size.height * .75 * pixelDensity;
-    for (double i = 0; i < length; i++) {
-      var xOffset = i * (this.angle * -.5);
-      _textPainter.paint(shadowMask, initialOffset + Offset(xOffset / pixelDensity, i / pixelDensity));
-    }
-
-    var picture = recorder.endRecording();
-    return picture.toImage(size.width.toInt(), size.height.toInt());
   }
 }
