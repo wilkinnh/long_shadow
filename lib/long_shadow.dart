@@ -56,7 +56,7 @@ class _LongShadowState extends State<LongShadow> {
   }
 
   Future<ui.Image> generateMaskImage(BuildContext context, Size size) {
-    var initialOffset = Offset((size.width - _textPainter.width) / 2, (size.height - _textPainter.height) / 2);
+    var offset = Offset((size.width - _textPainter.width) / 2, (size.height - _textPainter.height) / 2);
 
     var recorder = ui.PictureRecorder();
     Canvas shadowMask = Canvas(recorder);
@@ -64,7 +64,7 @@ class _LongShadowState extends State<LongShadow> {
     double length = size.height * .75;
     for (double i = 0; i < length; i++) {
       var xOffset = i * (this.widget.angle * -.5);
-      _textPainter.paint(shadowMask, initialOffset + Offset(xOffset, i));
+      _textPainter.paint(shadowMask, offset + Offset(xOffset, i));
     }
 
     var picture = recorder.endRecording();
