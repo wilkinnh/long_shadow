@@ -14,8 +14,8 @@ class LongShadow extends StatefulWidget {
 
 class _LongShadowState extends State<LongShadow> {
   GlobalKey _key = GlobalKey();
-  TextPainter _textPainter;
-  ui.Image _maskImage;
+  TextPainter _painter;
+  ui.Image _mask;
 
   @override
   void initState() {
@@ -23,7 +23,7 @@ class _LongShadowState extends State<LongShadow> {
 
     super.initState();
 
-    _textPainter = TextPainter(
+    _painter = TextPainter(
       text: TextSpan(
         text: this.widget.text.data,
         style: TextStyle(
@@ -33,73 +33,71 @@ class _LongShadowState extends State<LongShadow> {
       ),
       textDirection: TextDirection.ltr,
     );
-    _textPainter.layout();
+    _painter.layout();
   }
 
   @override
-  void didUpdateWidget(LongShadow oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void didUpdateWidget(LongShadow w) {
+    super.didUpdateWidget(w);
     updateMask();
   }
 
   void updateMask() async {
-    var state = _key.currentContext;
-    if (state == null || state.findRenderObject() == null) {
+    var cc = _key.currentContext;
+    if (cc == null || cc.findRenderObject() == null) {
       return;
     }
 
-    RenderBox renderBox = state.findRenderObject();
-    var mask = await generateMaskImage(context, renderBox.size);
+    RenderBox rb = cc.findRenderObject();
+    var i = await _maskImage(context, rb.size);
     setState(() {
-      _maskImage = mask;
+      _mask = i;
     });
   }
 
-  Future<ui.Image> generateMaskImage(BuildContext context, Size size) {
-    var offset = Offset((size.width - _textPainter.width) / 2, (size.height - _textPainter.height) / 2);
+  Future<ui.Image> _maskImage(BuildContext context, Size size) {
+    var offset = Offset((size.width - _painter.width) / 2, (size.height - _painter.height) / 2);
 
-    var recorder = ui.PictureRecorder();
-    Canvas shadowMask = Canvas(recorder);
+    var r = ui.PictureRecorder();
+    Canvas c = Canvas(r);
 
     double length = size.height * .75;
     for (double i = 0; i < length; i++) {
-      var xOffset = i * (this.widget.angle * -.5);
-      _textPainter.paint(shadowMask, offset + Offset(xOffset, i));
+      var x = i * (this.widget.angle * -.5);
+      _painter.paint(c, offset + Offset(x, i));
     }
 
-    var picture = recorder.endRecording();
-    return picture.toImage(size.width.toInt(), size.height.toInt());
+    return r.endRecording().toImage(size.width.toInt(), size.height.toInt());
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_maskImage == null) {
+    if (_mask == null) {
       return Container(key: _key);
     }
+    var w = this.widget;
     return Material(
       color: Colors.transparent,
       key: _key,
       child: Stack(
         children: <Widget>[
-          LayoutBuilder(builder: (context, constraints) {
-            return ShaderMask(
-              shaderCallback: (bounds) {
-                return ImageShader(_maskImage, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [this.widget.color, this.widget.color.withOpacity(0.0), this.widget.color.withOpacity(0.0)],
-                    stops: [0, 1.0, 1.0],
-                    tileMode: TileMode.clamp,
-                  ),
+          ShaderMask(
+            shaderCallback: (_) {
+              return ImageShader(_mask, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [w.color, w.color.withOpacity(0.0), w.color.withOpacity(0.0)],
+                  stops: [0, 1.0, 1.0],
+                  tileMode: TileMode.clamp,
                 ),
               ),
-            );
-          }),
-          Center(child: this.widget.text),
+            ),
+          ),
+          Center(child: w.text),
         ],
       ),
     );

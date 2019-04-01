@@ -11,24 +11,13 @@ class FlutterSampleApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.green),
       home: Scaffold(
-        body: FullscreenLongShadow(
-          text: Text('S', style: TextStyle(fontSize: 200, color: Colors.white)),
-        ),
+        body: FullscreenLongShadow(),
       ),
     );
   }
 }
 
 class FullscreenLongShadow extends StatefulWidget {
-  final Text text;
-  final Color backgroundColor;
-
-  const FullscreenLongShadow({
-    Key key,
-    @required this.text,
-    this.backgroundColor = Colors.green,
-  }) : super(key: key);
-
   @override
   _FullscreenLongShadowState createState() => _FullscreenLongShadowState();
 }
@@ -40,13 +29,13 @@ class _FullscreenLongShadowState extends State<FullscreenLongShadow> {
   void initState() {
     super.initState();
 
-    gyroscopeEvents.listen((GyroscopeEvent event) {
-      if (event.y.abs() < 0.2) {
+    gyroscopeEvents.listen((GyroscopeEvent e) {
+      if (e.y.abs() < 0.2) {
         return;
       }
 
-      var normalizedSpeed = event.y / 30;
-      var newValue = max(min(1, normalizedSpeed + _angle), -1).toDouble();
+      var speed = e.y / 30;
+      var newValue = max(min(1, speed + _angle), -1).toDouble();
 
       setState(() {
         _angle = newValue;
@@ -57,9 +46,9 @@ class _FullscreenLongShadowState extends State<FullscreenLongShadow> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: this.widget.backgroundColor,
+      color: Colors.green,
       child: LongShadow(
-        text: this.widget.text,
+        text: Text('S', style: TextStyle(fontSize: 200, color: Colors.white)),
         color: Colors.black38,
         angle: _angle,
       ),
