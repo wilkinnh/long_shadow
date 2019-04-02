@@ -6,7 +6,7 @@ Flutter widget that implements the [long shadow design pattern](https://designmo
 
 Sample app is hooked up to the device's gyro sensors, allowing you to change the shadow angle by tilting the phone left and right.
 
-![GIF of demo app](/images/demo.gif)
+![GIF of demo app](/images/demo.gif | width=320)
 
 ## Getting Started
 
@@ -22,10 +22,10 @@ The `LongShadow` widget has 3 parameters:
 
 Test out long shadows with different text, font size, and shadow angles. This also includes gyro support.
 
-![Image of playground](/images/playground.png)
+![Image of playground](/images/playground.png | width=320)
 
 ### Periodic Table
 
 Example app using long shadows with the periodic table
 
-![Image of periodic table](/images/periodic-table.gif)
+![Image of periodic table](/images/periodic-table.gif | width=360)
