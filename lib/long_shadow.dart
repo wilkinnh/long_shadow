@@ -20,9 +20,17 @@ class _LongShadowState extends State<LongShadow> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) => updateMask());
-
     super.initState();
+    updateMask();
+  }
 
+  @override
+  void didUpdateWidget(LongShadow w) {
+    super.didUpdateWidget(w);
+    updateMask();
+  }
+
+  void updateMask() async {
     _painter = TextPainter(
       text: TextSpan(
         text: this.widget.text.data,
@@ -34,28 +42,20 @@ class _LongShadowState extends State<LongShadow> {
       textDirection: TextDirection.ltr,
     );
     _painter.layout();
-  }
 
-  @override
-  void didUpdateWidget(LongShadow w) {
-    super.didUpdateWidget(w);
-    updateMask();
-  }
-
-  void updateMask() async {
     var cc = _key.currentContext;
     if (cc == null || cc.findRenderObject() == null) {
       return;
     }
 
     RenderBox box = cc.findRenderObject();
-    var image = await _maskImage(context, box.size);
+    var image = await generateMask(context, box.size);
     setState(() {
       _mask = image;
     });
   }
 
-  Future<ui.Image> _maskImage(BuildContext context, Size size) {
+  Future<ui.Image> generateMask(BuildContext context, Size size) {
     var offset = Offset((size.width - _painter.width) / 2, (size.height - _painter.height) / 2);
 
     var recorder = ui.PictureRecorder();
@@ -90,8 +90,8 @@ class _LongShadowState extends State<LongShadow> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [w.color, w.color.withOpacity(0.0), w.color.withOpacity(0.0)],
-                  stops: [0, 1.0, 1.0],
+                  colors: [w.color, w.color.withOpacity(0.0)],
+                  stops: [0, 1.0],
                   tileMode: TileMode.clamp,
                 ),
               ),
