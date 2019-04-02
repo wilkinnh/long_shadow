@@ -48,26 +48,26 @@ class _LongShadowState extends State<LongShadow> {
       return;
     }
 
-    RenderBox rb = cc.findRenderObject();
-    var i = await _maskImage(context, rb.size);
+    RenderBox box = cc.findRenderObject();
+    var image = await _maskImage(context, box.size);
     setState(() {
-      _mask = i;
+      _mask = image;
     });
   }
 
   Future<ui.Image> _maskImage(BuildContext context, Size size) {
     var offset = Offset((size.width - _painter.width) / 2, (size.height - _painter.height) / 2);
 
-    var r = ui.PictureRecorder();
-    Canvas c = Canvas(r);
+    var recorder = ui.PictureRecorder();
+    Canvas canvas = Canvas(recorder);
 
     double length = size.height * .75;
     for (double i = 0; i < length; i++) {
       var x = i * (this.widget.angle * -.5);
-      _painter.paint(c, offset + Offset(x, i));
+      _painter.paint(canvas, offset + Offset(x, i));
     }
 
-    return r.endRecording().toImage(size.width.toInt(), size.height.toInt());
+    return recorder.endRecording().toImage(size.width.toInt(), size.height.toInt());
   }
 
   @override
